@@ -1,0 +1,240 @@
+#jingyi-translator-settings .jingyi-entry-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 4px;
+}
+
+#jingyi-translator-settings .jingyi-entry-state {
+  color: var(--SmartThemeBodyColor, #b8bec8);
+  font-size: 0.88em;
+}
+
+#jingyi-translator-settings .jingyi-open-button {
+  width: auto;
+  min-width: 132px;
+}
+
+#jingyi-translator-floating-button {
+  position: fixed;
+  z-index: 2147482900;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  gap: 9px;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  border: 1px solid #4d7a68;
+  border-radius: 999px;
+  color: #e7d6a6;
+  background: #173b31;
+  box-shadow: 0 7px 20px #07181344;
+  cursor: grab;
+  opacity: 0.86;
+  --jy-fab-progress: 1;
+  --jy-fab-accent: #96a1ad;
+  transition:
+    width 380ms cubic-bezier(0.22, 0.72, 0.2, 1),
+    border-radius 380ms cubic-bezier(0.22, 0.72, 0.2, 1),
+    padding 380ms cubic-bezier(0.22, 0.72, 0.2, 1),
+    opacity 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+#jingyi-translator-floating-button[data-form="pill"] {
+  width: 124px;
+  padding-right: 14px;
+}
+
+/* Only the running pill carries a progress bar and a percentage, so only it needs the extra room. */
+#jingyi-translator-floating-button[data-form="pill"][data-status="running"] {
+  width: 178px;
+}
+
+/* Hovering previews the expanded form, so the shape change is reachable even while nothing is running.
+   The edge form is the phone shape and never sees a hover. */
+#jingyi-translator-floating-button:hover:not([data-form="edge"]),
+#jingyi-translator-floating-button:focus-visible:not([data-form="edge"]) {
+  width: 124px;
+  padding-right: 14px;
+}
+
+#jingyi-translator-floating-button[data-status="running"]:hover:not([data-form="edge"]),
+#jingyi-translator-floating-button[data-status="running"]:focus-visible:not([data-form="edge"]) {
+  width: 178px;
+}
+
+#jingyi-translator-floating-button[data-form="edge"] {
+  width: 34px;
+  border-right: 0;
+  border-radius: 999px 0 0 999px;
+  box-shadow: -4px 6px 18px #07181366;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-core {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+}
+
+#jingyi-translator-floating-button[data-form="edge"] .jingyi-fab-core {
+  width: 32px;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-ring {
+  position: absolute;
+  inset: 3px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-ring .jingyi-fab-track {
+  fill: none;
+  stroke: #35604f;
+  stroke-width: 2;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-ring .jingyi-fab-value {
+  fill: none;
+  stroke: var(--jy-fab-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--jy-fab-progress) * 100);
+  transition: stroke-dashoffset 400ms cubic-bezier(0.3, 0.7, 0.4, 1), stroke 260ms ease;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-glyph {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-glyph svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#jingyi-translator-floating-button[data-form="edge"] .jingyi-fab-glyph svg {
+  width: 14px;
+  height: 14px;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+  opacity: 0;
+  text-align: left;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+#jingyi-translator-floating-button[data-form="pill"] .jingyi-fab-detail,
+#jingyi-translator-floating-button:hover:not([data-form="edge"]) .jingyi-fab-detail,
+#jingyi-translator-floating-button:focus-visible:not([data-form="edge"]) .jingyi-fab-detail {
+  opacity: 1;
+  transition-delay: 210ms;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-label {
+  color: #e7eee3;
+  font: 600 11px/1.4 system-ui, "Microsoft YaHei", sans-serif;
+  white-space: nowrap;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-count {
+  color: #9db4a6;
+  font: 10px/1.4 system-ui, "Microsoft YaHei", sans-serif;
+  white-space: nowrap;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-bar {
+  display: none;
+  height: 3px;
+  border-radius: 2px;
+  background: #0f2c24;
+  overflow: hidden;
+}
+
+#jingyi-translator-floating-button .jingyi-fab-bar > i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--jy-fab-accent);
+  transform: scaleX(var(--jy-fab-progress));
+  transform-origin: 0 50%;
+  transition: transform 240ms linear, background 200ms ease;
+}
+
+#jingyi-translator-floating-button[data-status="running"] .jingyi-fab-bar { display: block; }
+
+#jingyi-translator-floating-button[data-status="running"] { --jy-fab-accent: #f0c56e; }
+#jingyi-translator-floating-button[data-status="success"] { --jy-fab-accent: #8ee1d6; }
+#jingyi-translator-floating-button[data-status="error"] { --jy-fab-accent: #f18f8f; }
+
+#jingyi-translator-floating-button:hover,
+#jingyi-translator-floating-button:focus-visible,
+#jingyi-translator-floating-button.is-dragging {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 13px 36px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(117, 213, 201, 0.15);
+}
+
+#jingyi-translator-floating-button[data-form="edge"]:hover,
+#jingyi-translator-floating-button[data-form="edge"]:focus-visible,
+#jingyi-translator-floating-button[data-form="edge"].is-dragging {
+  transform: translateX(-2px);
+}
+
+#jingyi-translator-floating-button:active,
+#jingyi-translator-floating-button.is-dragging { cursor: grabbing; }
+
+#jingyi-translator-floating-button:focus-visible {
+  outline: 2px solid #b9f3eb;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #jingyi-translator-floating-button,
+  #jingyi-translator-floating-button .jingyi-fab-detail,
+  #jingyi-translator-floating-button .jingyi-fab-value,
+  #jingyi-translator-floating-button .jingyi-fab-bar > i {
+    transition-duration: 1ms;
+    transition-delay: 0ms;
+  }
+}
+
+#jingyi-translator-floating-button[data-theme="night"] { background:#202932; color:#c5ddd0; border-color:#62766a; }
+#jingyi-translator-floating-button[data-theme="fresh"] { background:#e0ead3; color:#416239; border-color:#9eb28d; }
+#jingyi-translator-floating-button[data-theme="fresh"] .jingyi-fab-label { color:#29472f; }
+#jingyi-translator-floating-button[data-theme="fresh"] .jingyi-fab-count { color:#536d4b; }
+#jingyi-translator-floating-button[data-theme="vampire"] { background:#351724; color:#e4bd7b; border-color:#956f40; }
+#jingyi-translator-floating-button[data-theme="glass"] { background:#355d7380; backdrop-filter:blur(12px); color:#f3f8fc; border-color:#bed3df80; }

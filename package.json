@@ -1,0 +1,12 @@
+{
+  "name": "st-jingyi-translator",
+  "version": "0.11.5",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check index.js && node --check core.js && node --check jailbreak-default.js && node --check prompts.js && node --check workflow.js && node --check diagnostics.js && node --check scripts/preview-server.mjs",
+    "preview": "node scripts/preview-server.mjs",
+    "test": "node --test",
+    "validate": "npm run check && npm test"
+  }
+}

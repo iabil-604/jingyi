@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>镜译扩展本地宿主预览</title>
+  <link rel="stylesheet" href="./host.css">
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, "Microsoft YaHei", sans-serif; background: #15171c; color: #eceff4; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, #252a32, #111318 58%); }
+    .mock-toolbar { position: sticky; top: 0; display: flex; gap: 12px; align-items: center; padding: 14px 18px; border-bottom: 1px solid #343a45; background: #181b21; }
+    .mock-toolbar h1 { margin: 0 auto 0 0; font-size: 17px; }
+    #extensionsMenu { display: flex; gap: 8px; }
+    .list-group-item, .menu_button { padding: 9px 12px; border: 1px solid #48505e; border-radius: 9px; background: #252b35; color: #eef1f6; cursor: pointer; }
+    .mock-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; width: min(1200px, calc(100% - 32px)); margin: 24px auto; }
+    .mock-card { padding: 20px; border: 1px solid #343a45; border-radius: 16px; background: #1b1f27; box-shadow: 0 18px 46px rgba(0,0,0,.22); }
+    .mock-card h2 { margin-top: 0; font-size: 16px; }
+    .mock-probe { display: grid; gap: 6px; margin-bottom: 16px; color: #aeb7c4; font-size: 13px; }
+    .mock-probe input { box-sizing: border-box; width: 100%; height: 36px; padding: 7px 9px; border: 1px solid #48505e; border-radius: 7px; background: #12151a; color: #eef1f6; }
+    #chat-preview { white-space: pre-wrap; line-height: 1.8; color: #dce2ea; }
+    .extension_container { padding: 13px; border: 1px solid #3a414d; border-radius: 12px; }
+    .inline-drawer-header { display: flex; justify-content: space-between; }
+    @media (max-width: 760px) { .mock-layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="mock-toolbar">
+    <h1>SillyTavern 1.18.0 模拟宿主</h1>
+    <div id="extensionsMenu" aria-label="魔法棒扩展菜单"></div>
+  </header>
+  <main class="mock-layout">
+    <section class="mock-card">
+      <h2>当前 AI 回复</h2>
+      <div id="chat-preview"></div>
+    </section>
+    <aside class="mock-card">
+      <h2>扩展设置区</h2>
+      <label class="mock-probe">宿主输入框样式探针<input id="host-style-probe" value="不应被扩展样式拉伸"></label>
+      <div id="extensions_settings2"></div>
+    </aside>
+  </main>
+
+  <script type="module">
+    class MockEvents {
+      constructor() { this.listeners = new Map(); }
+      on(type, handler) { if (!this.listeners.has(type)) this.listeners.set(type, new Set()); this.listeners.get(type).add(handler); }
+      removeListener(type, handler) { this.listeners.get(type)?.delete(handler); }
+      async emit(type, ...args) { for (const handler of this.listeners.get(type) || []) await handler(...args); }
+    }
+
+    const eventTypes = {
+      GENERATION_STARTED: 'generation_started',
+      GENERATION_STOPPED: 'generation_stopped',
+      CHARACTER_MESSAGE_RENDERED: 'character_message_rendered',
+      MESSAGE_SWIPED: 'message_swiped',
+      MESSAGE_EDITED: 'message_edited',
+      MESSAGE_UPDATED: 'message_updated',
+      CHAT_CHANGED: 'chat_changed',
+    };
+    const eventSource = new MockEvents();
+    const original = `<story_scene>\n夕暮れの教室には、誰もいなかった。\n窓から差し込む光が、机を淡く照らしている。\n\n「明日も、ここで会える？」\n</story_scene>`;
+    const chat = [{
+      mes: original,
+      name: 'Assistant',
+      is_user: false,
+      is_system: false,
+      swipe_id: 0,
+      swipes: [original],
+      swipe_info: [{ extra: {} }],
+      extra: {},
+    }];
+    const renderChat = () => { document.getElementById('chat-preview').textContent = chat[0].mes; };
+    renderChat();
+    let insertedImageTag = false;
+
+    const translatePayload = prompt => {
+      const user = Array.isArray(prompt) ? prompt.findLast(item => item.role === 'user') : null;
+      const body = user ? JSON.parse(user.content) : { segments: [{ id: 1 }] };
+      const translations = body.segments.map(item => ({ id: item.id, text: `{第${item.id}段\n中文镜像}` })).reverse();
+      return `模型说明会被忽略\n\`\`\`json\n${JSON.stringify({ translations })}\n\`\`\``;
+    };
+    const context = {
+      chat,
+      chatId: 'preview-chat',
+      name1: '玩家',
+      name2: '樱井',
+      characterId: 0,
+      groupId: null,
+      maxContext: 8192,
+      characters: [{ name: '樱井', description: '旅行者。', personality: '平静。', scenario: '王都。' }],
+      eventSource,
+      eventTypes,
+      extensionSettings: {
+        disabledExtensions: [],
+        'jingyi-translator': { excludedTags: ['image_prompt'] },
+        connectionManager: {
+          profiles: [{ id: 'preview-profile', name: '副 API 测试配置', model: 'translator-model', api: 'openai' }],
+        },
+      },
+      saveSettingsDebounced() {},
+      getRequestHeaders() { return { 'Content-Type': 'application/json' }; },
+      substituteParams(value) { return value; },
+      async getWorldInfoPrompt() { return { worldInfoBefore: '桜井的中文写法是樱井。', worldInfoAfter: '' }; },
+      async saveChat() {},
+      updateMessageBlock() { renderChat(); },
+      async generateRaw({ prompt }) {
+        if (!insertedImageTag) {
+          insertedImageTag = true;
+          chat[0].mes = chat[0].mes.replace('\n\n「明日も', '\n\n<image_prompt data-preview="late-insert"/>\n「明日も');
+          chat[0].swipes[0] = chat[0].mes;
+          renderChat();
+        }
+        return translatePayload(prompt);
+      },
+      ChatCompletionService: {
+        async processRequest(payload) { return { content: translatePayload(payload.messages), reasoning: '' }; },
+      },
+    };
+    globalThis.toastr = {
+      success(message, title) { console.info(`${title}: ${message}`); },
+      error(message, title) { console.error(`${title}: ${message}`); },
+      info(message, title) { console.info(`${title}: ${message}`); },
+    };
+    globalThis.SillyTavern = { getContext: () => context };
+    const extension = await import('./index.js');
+    await extension.onActivate();
+    globalThis.__JINGYI_PREVIEW__ = { context, extension };
+  </script>
+</body>
+</html>

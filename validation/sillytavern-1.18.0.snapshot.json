@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-31T00:00:00.000Z",
+  "provenance": {
+    "kind": "source-audit",
+    "repository": "https://github.com/SillyTavern/SillyTavern",
+    "tag": "1.18.0",
+    "commit": "51ad27fb86d39a3daca3adaa970375c9670c12df"
+  },
+  "versions": {
+    "sillytavern": "1.18.0",
+    "tavern-helper": null
+  },
+  "symbols": [
+    "SillyTavern.getContext",
+    "SillyTavern.getContext().generateRaw",
+    "SillyTavern.getContext().updateMessageBlock",
+    "SillyTavern.getContext().ChatCompletionService",
+    "SillyTavern.getContext().getWorldInfoPrompt",
+    "SillyTavern.getContext().getRequestHeaders"
+  ]
+}
